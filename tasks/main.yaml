@@ -1,0 +1,30 @@
+---
+- name: "Create Directories"
+  file:
+    state: "directory"
+    path: "/etc/sysconfig"
+  when:
+    - "lobalancer is defined"
+  tags:
+    - "lobalancer"
+- name: "Apply Templates"
+  template:
+    dest: "/etc/sysconfig/lobalancer@{{ item.ipv4 | ipaddr('address') }}.env"
+    src:  "lobalancer@.env.j2"
+  with_items: "{{ lobalancer }}"
+  notify: "lobalancer-restart"
+  when:
+    - lobalancer is defined
+  tags:
+    - lobalancer
+- name: "Start and Enable Services"
+  service:
+    name:          "lobalancer@{{ item.name | default(item.ipv4 | ipaddr('address')) }}.timer"
+    enabled:       "yes"
+    state:         "started"
+    daemon_reload: "yes"
+  with_items: "{{ lobalancer }}"
+  when:
+    - lobalancer is defined
+  tags:
+    - lobalancer
