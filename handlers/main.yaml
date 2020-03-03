@@ -4,5 +4,7 @@
     daemon_reload: "yes"
     name:          "lobalancer@{{ item.name | default(item.ipv4 | ipaddr('address')) }}.timer"
     state:         "restarted"
-  with_items: "{{ lobalancer }}"
+  vars:
+    jmespath: "[{% for var in (lookup('varnames', '^lobalancer_.+') | join).split(',') %}{{ var }}{{ ',' if not loop.last else '' }}{% endfor %}][]"
+  with_items: "{{ ([]) if jmespath == '[][]' else (vars | to_json | from_json | json_query(jmespath)) }}"
   listen: "lobalancer-restart"
