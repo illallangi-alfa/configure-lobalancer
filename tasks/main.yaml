@@ -1,17 +1,12 @@
 ---
-#- debug:
-#    msg: "{{ item }}"
-#  vars:
-#    jmespath: "[{% for var in (lookup('varnames', '^lobalancer_.+') | join).split(',') %}{{ var }}{{ ',' if not loop.last else '' }}{% endfor %}][]"
-#  with_items: "{{ ([]) if jmespath == '[][]' else (vars | to_json | from_json | json_query(jmespath)) }}"
-#  tags:
-#    - "lobalancer"
+
 - name: "Create Directories"
   file:
     state: "directory"
     path: "/etc/sysconfig"
   tags:
     - "lobalancer"
+
 - name: "Apply Templates"
   template:
     dest: "/etc/sysconfig/lobalancer@{{ item.ipv4 | ipaddr('address') }}.env"
@@ -21,7 +16,8 @@
   with_items: "{{ ([]) if jmespath == '[][]' else (vars | to_json | from_json | json_query(jmespath)) }}"
   notify: "lobalancer-restart"
   tags:
-    - lobalancer
+    - "lobalancer"
+
 - name: "Start and Enable Services"
   service:
     name:          "lobalancer@{{ item.name | default(item.ipv4 | ipaddr('address')) }}.timer"
@@ -32,4 +28,4 @@
     jmespath: "[{% for var in (lookup('varnames', '^lobalancer_.+') | join).split(',') %}{{ var }}{{ ',' if not loop.last else '' }}{% endfor %}][]"
   with_items: "{{ ([]) if jmespath == '[][]' else (vars | to_json | from_json | json_query(jmespath)) }}"
   tags:
-    - lobalancer
+    - "lobalancer"
