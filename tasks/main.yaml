@@ -20,7 +20,7 @@
 
 - name: "Start and Enable Services"
   service:
-    name:          "lobalancer@{{ item.name | default(item.ipv4 | ipaddr('address')) }}.timer"
+    name:          "lobalancer@{{ item.name | default(item.ipv4 | ipaddr('address')) }}.service"
     enabled:       "yes"
     state:         "started"
     daemon_reload: "yes"
